@@ -32,12 +32,19 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            new string[] { } }
+            Array.Empty<string>() }
     });
 });
 
+// Configure Entity Framework and Identity with SQL Server
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MainConnection")));
+
+builder.Services.AddSingleton<MongoDBContext>(sp =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("MongoConnection");
+    return new MongoDBContext(connectionString, "sample_mflix");
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
