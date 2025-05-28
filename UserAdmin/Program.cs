@@ -1,11 +1,12 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using UserAdmin.Data;
+using UserAdmin.Data.Entities;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
@@ -43,16 +44,48 @@ builder.Services.AddDbContext<DataContext>(options =>
 builder.Services.AddSingleton<MongoDBContext>(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoConnection");
+    if (string.IsNullOrEmpty(connectionString))
+        throw new InvalidOperationException("MongoDB connection string is not configured.");
     return new MongoDBContext(connectionString, "sample_mflix");
 });
 
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddAuthentication( auth =>
+{
+    auth.DefaultAuthenticateScheme = auth.DefaultChallengeScheme = auth.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer( jwt =>
+{
+    jwt.SaveToken = false;
+    jwt.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Appsettings:JWTSecret"]!))
+    };
+});
+builder.Services.AddIdentityApiEndpoints<AppUser>()
     .AddEntityFrameworkStores<DataContext>();
 
-var app = builder.Build();
+builder.Services.Configure<IdentityOptions>(options =>
+{
+    // User settings
+    options.User.RequireUniqueEmail = true;
 
-app.MapIdentityApi<IdentityUser>();
+    // Lockout settings
+    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
+    options.Lockout.MaxFailedAccessAttempts = 5;
+});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp",
+        policy => policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .WithExposedHeaders("Authorization"));
+});
+
+var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -61,14 +94,17 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserAdmin API V1");
-        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+        c.RoutePrefix = string.Empty;
     });
 }
 
+app.UseCors("AllowAngularApp");
+app.UseAuthentication();
+app.UseAuthorization();
+
 app.UseHttpsRedirection();
 
-app.UseAuthorization();
 
 app.MapControllers();
 
-app.Run();
+await app.RunAsync();
