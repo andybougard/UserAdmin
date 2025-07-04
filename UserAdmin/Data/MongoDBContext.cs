@@ -1,6 +1,7 @@
 using MongoDB.Driver;
 using UserAdmin.MongoEntities;
 
+namespace UserAdmin.Data;
 public class MongoDBContext
 {
     private readonly IMongoDatabase _database;

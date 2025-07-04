@@ -9,6 +9,7 @@ namespace UserAdmin.Controllers
     using Microsoft.IdentityModel.Tokens;
     using System.Security.Claims;
     using System.IdentityModel.Tokens.Jwt;
+    using UserAdmin.Models.Auth;
 
     [ApiController]
     [Route("[controller]")]
@@ -111,7 +112,9 @@ namespace UserAdmin.Controllers
                         new Claim(ClaimTypes.Email, user.Email!)
                     }),
                     Expires = DateTime.UtcNow.AddMinutes(15),
-                    SigningCredentials = new SigningCredentials(loginKey, SecurityAlgorithms.HmacSha256Signature)
+                    SigningCredentials = new SigningCredentials(loginKey, SecurityAlgorithms.HmacSha256Signature),
+                    Audience = _configuration["AppSettings:JWTAudience"],
+                    Issuer = _configuration["AppSettings:JWTIssuer"]
                 };
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -122,6 +125,28 @@ namespace UserAdmin.Controllers
             else
             {
                 return Unauthorized(new { Message = "Invalid credentials" });
+            }
+        }
+        [HttpPost("ChangePassword")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+                return NotFound(new { Message = "User not found" });
+
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (result.Succeeded)
+            {
+                return Ok(new { Message = "Password changed successfully" });
+            }
+            else
+            {
+                return BadRequest(result.Errors);
             }
         }
     }
