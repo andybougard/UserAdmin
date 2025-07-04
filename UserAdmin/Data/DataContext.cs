@@ -3,15 +3,13 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using UserAdmin.Data.Entities;
 
-namespace UserAdmin.Data
+namespace UserAdmin.Data;
+public class DataContext : IdentityDbContext<IdentityUser>
 {
-    public class DataContext : IdentityDbContext<IdentityUser>
+    public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {
-        }
-
-        // Add DbSet properties for your entities here
-        public DbSet<AppUser> AppUsers { get; set; }
     }
+
+    // Add DbSet properties for your entities here
+    public DbSet<AppUser> AppUsers { get; set; }
 }

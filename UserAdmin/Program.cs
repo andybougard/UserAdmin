@@ -41,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<DataContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("MainConnection")));
 
-builder.Services.AddSingleton<MongoDBContext>(sp =>
+builder.Services.AddSingleton(sp =>
 {
     var connectionString = builder.Configuration.GetConnectionString("MongoConnection");
     if (string.IsNullOrEmpty(connectionString))
@@ -60,7 +60,11 @@ builder.Services.AddAuthentication( auth =>
     jwt.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Appsettings:JWTSecret"]!))
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(builder.Configuration["Appsettings:JWTSecret"]!)),
+        ValidateAudience = true,
+        ValidAudience = builder.Configuration["AppSettings:JWTAudience"],
+        ValidateIssuer = true,
+        ValidIssuer = builder.Configuration["AppSettings:JWTIssuer"]
     };
 });
 builder.Services.AddIdentityApiEndpoints<AppUser>()
@@ -101,10 +105,7 @@ if (app.Environment.IsDevelopment())
 app.UseCors("AllowAngularApp");
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.UseHttpsRedirection();
-
-
 app.MapControllers();
 
 await app.RunAsync();

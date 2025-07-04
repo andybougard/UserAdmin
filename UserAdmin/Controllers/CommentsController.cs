@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
+using UserAdmin.Data;
 using UserAdmin.MongoEntities;
 
 namespace UserAdmin.Controllers
