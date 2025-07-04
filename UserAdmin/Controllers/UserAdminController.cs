@@ -51,7 +51,7 @@ public class UserAdminController : ControllerBase
             var user = _userManager.Users.FirstOrDefault(u => u.Email == email);
             if (user == null)
             {
-                return NotFound(new { Message = "User not found" });
+                return NotFound(new { Message = Constants.USER_NOT_FOUND_MESSAGE });
             }
 
             var userInfo = new UserInfoResponseModel

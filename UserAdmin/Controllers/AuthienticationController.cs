@@ -30,7 +30,7 @@ namespace UserAdmin.Controllers
         {
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null)
-                return NotFound("User not found");
+                return NotFound(Constants.USER_NOT_FOUND_MESSAGE);
 
             var secretKey = await _userManager.GetAuthenticatorKeyAsync(user);
             var email = user.Email;
@@ -43,7 +43,7 @@ namespace UserAdmin.Controllers
         {
             var requestUser = await _userManager.FindByNameAsync(userName);
             if (requestUser == null)
-                return NotFound("User not found");
+                return NotFound(Constants.USER_NOT_FOUND_MESSAGE);
 
             var update2FA = await _userManager.SetTwoFactorEnabledAsync(requestUser, enable);
             if (update2FA.Succeeded)
@@ -96,7 +96,7 @@ namespace UserAdmin.Controllers
 
             var user = await _userManager.FindByEmailAsync(userRequest.Email);
             if (user == null)
-                return NotFound(new { Message = "User not found" });
+                return NotFound(new { Message = Constants.USER_NOT_FOUND_MESSAGE });
 
 
             bool result = await _userManager.CheckPasswordAsync(user, userRequest.Password);
@@ -137,7 +137,7 @@ namespace UserAdmin.Controllers
 
             var user = await _userManager.FindByEmailAsync(model.Email);
             if (user == null)
-                return NotFound(new { Message = "User not found" });
+                return NotFound(new { Message = Constants.USER_NOT_FOUND_MESSAGE });
 
             var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
             if (result.Succeeded)
