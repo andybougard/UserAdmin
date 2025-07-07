@@ -21,6 +21,7 @@ public class UserAdminController : ControllerBase
 
     [HttpGet]
     [Route("users")]
+    [ProducesResponseType(typeof(List<UserInfoResponseModel>), 200)]
     public IActionResult GetUsers()
     {
         try
@@ -44,6 +45,7 @@ public class UserAdminController : ControllerBase
 
     [HttpGet]
     [Route("users/{email}")]
+    [ProducesResponseType(typeof(UserInfoResponseModel), 200)]
     public IActionResult GetUserByEmail(string email)
     {
         try
@@ -69,12 +71,13 @@ public class UserAdminController : ControllerBase
         catch (Exception ex)
         {
             return StatusCode(500, new { Message = "An error occurred while retrieving the user", Error = ex.Message });
-            
+
         }
     }
 
     [HttpPost]
     [Route("users")]
+    [ProducesResponseType(typeof(string), 200)]
     public IActionResult CreateUser([FromBody] UserRegistrationModel user)
     {
         try
