@@ -10,6 +10,7 @@ namespace UserAdmin.Controllers
     using System.Security.Claims;
     using System.IdentityModel.Tokens.Jwt;
     using UserAdmin.Models.Auth;
+    using Serilog;
 
     [ApiController]
     [Route("[controller]")]
@@ -120,6 +121,7 @@ namespace UserAdmin.Controllers
                 var token = tokenHandler.CreateToken(tokenDescriptor);
                 Response.Headers.Append("Authorization", tokenHandler.WriteToken(token));
 
+                Log.Information("User {UserName} logged in successfully", user.UserName);
                 return Ok(new { Message = "Login successful" });
             }
             else
