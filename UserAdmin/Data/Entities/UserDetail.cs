@@ -12,7 +12,7 @@ namespace UserAdmin.Data.Entities
         [Column(TypeName = "nvarchar(150)")]
         public string? LastName { get; set; }
         [PersonalData]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
         [PersonalData]
         [Column(TypeName = "nvarchar(500)")]
         public string? Address { get; set; }

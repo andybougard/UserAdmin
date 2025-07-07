@@ -14,6 +14,6 @@ namespace UserAdmin.MongoEntities
         [BsonRepresentation(BsonType.ObjectId)]
         public string? movie_id { get; set; }
         public string? text { get; set; }
-        public DateTime date { get; set; }
+        public DateTime? date { get; set; }
     }
 }
