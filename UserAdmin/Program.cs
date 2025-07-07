@@ -3,10 +3,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Sinks.Graylog;
+using Serilog.Sinks.Graylog.Core.Transport;
 using UserAdmin.Data;
 using UserAdmin.Data.Entities;
 
+var logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .WriteTo.Graylog(
+        new GraylogSinkOptions
+        {
+            HostnameOrAddress = "localhost",
+            Port = 12201,
+            Facility = "UserAdmin",
+            TransportType = TransportType.Udp
+        })
+        .CreateLogger();
+
+Log.Logger = logger;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Host.UseSerilog();
 
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
