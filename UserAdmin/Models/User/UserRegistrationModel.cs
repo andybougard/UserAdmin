@@ -26,7 +26,7 @@ namespace UserAdmin.Models.User
         public string? LastName { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [StringLength(500, ErrorMessage = "Address cannot be longer than 500 characters")]
         public string? Address { get; set; }

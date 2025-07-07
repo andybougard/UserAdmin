@@ -16,7 +16,7 @@ namespace UserAdmin.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-
+            //Auto-generated code to revert the migration
         }
     }
 }
