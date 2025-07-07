@@ -103,7 +103,7 @@ namespace UserAdmin.Controllers
             bool result = await _userManager.CheckPasswordAsync(user, userRequest.Password);
             if (result)
             {
-                var loginKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(_configuration["Appsettings:JWTSecret"]!));
+                var loginKey = new SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET")!));
                 var tokenDescriptor = new SecurityTokenDescriptor
                 {
                     Subject = new ClaimsIdentity(new[]
